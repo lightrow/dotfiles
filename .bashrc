@@ -93,6 +93,10 @@ set show-all-if-ambiguous on
 set colored-completion-prefix on
 set colored-stats on
 
+alias dcu="docker-compose -f ./docker-compose.dev.yml up"
+alias dcd="docker-compose down"
+alias dcs="docker-compose stop"
+alias beep="echo -ne '\007'"
 alias tmx='tmux new-session -A -s main'
 alias upd="sudo apt update && sudo apt upgrade"
 alias ins="sudo apt install"
