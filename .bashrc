@@ -1,12 +1,34 @@
-source ~/.git-prompt.sh
+#source ~/.git-prompt.sh
+#source /etc/grc.bashrc
+
 GIT_PS1_SHOWDIRTYSTATE=true
 GIT_PS1_SHOWSTASHSTATE=true
 GIT_PS1_SHOWUNTRACKEDFILES=true
 
-if [ -z "$TMUX" ] && [ ${UID} != 0 ]
-then
-    tmux new-session -A -s main
+
+JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+HAULMONT_REPOSITORY_USER="developer"
+HAULMONT_REPOSITORY_PASSWORD="Haul2010"
+EDGE_REPOSITORY_USER="edge-user"
+EDGE_REPOSITORY_PASSWORD="wA5eV7ByCl6d"
+
+
+export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
+
+export HAULMONT_REPOSITORY_USER=developer
+export HAULMONT_REPOSITORY_PASSWORD=Haul2010
+export EDGE_REPOSITORY_USER=edge-user
+export EDGE_REPOSITORY_PASSWORD=wA5eV7ByCl6d
+
+
+NPM_PACKAGES="${HOME}/.npm-global"
+
+if command -v tmux>/dev/null; then
+        if [ ! -z "$PS1" ]; then # unless shell not loaded interactively, run tmux
+		[[ ! $TERM =~ screen ]] && [ -z $TMUX ] && tmux new -A -s mysession
+        fi
 fi
+
 
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
@@ -67,7 +89,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[33m\]$(__git_ps1 " (%s) ")\[\033[00m\]\$ '
+    PS1='\[\033[01;30m\]\t\n${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n\[\033[33m\]$(__git_ps1 "(%s) ")\[\033[00m\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -87,11 +109,23 @@ esac
 
 bind 'set show-all-if-ambiguous on'
 bind 'TAB:menu-complete'
+bind "set menu-complete-display-prefix on"
 
 set completion-ignore-case on
 set show-all-if-ambiguous on
 set colored-completion-prefix on
 set colored-stats on
+
+function tclog()
+{
+grc tail -f /proc/$(pgrep -f tomcat)/fd/1
+}
+
+
+function tclogerr()
+{
+grc tail -f /proc/$(pgrep -f tomcat)/fd/0
+}
 
 alias dcu="docker-compose -f ./docker-compose.dev.yml up"
 alias dcd="docker-compose down"
@@ -101,7 +135,9 @@ alias tmx='tmux new-session -A -s main'
 alias upd="sudo apt update && sudo apt upgrade"
 alias ins="sudo apt install"
 alias untar="tar -xvzf"
-
+alias upd="sudo apt update && sudo apt list --upgradable"
+alias updy="upd && sudo apt upgrade"
+alias updtime="sudo date -s \"\$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z\" && sudo hwclock --systohc"
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -148,3 +184,8 @@ if ! shopt -oq posix; then
   fi
 fi
 
+export PATH="$NPM_PACKAGES/bin:$PATH"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="/home/jo/.sdkman"
+[[ -s "/home/jo/.sdkman/bin/sdkman-init.sh" ]] && source "/home/jo/.sdkman/bin/sdkman-init.sh"
